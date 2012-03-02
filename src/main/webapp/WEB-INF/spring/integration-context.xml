@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        			http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+					http://www.springframework.org/schema/integration 
+					http://www.springframework.org/schema/integration/spring-integration.xsd
+                	http://www.springframework.org/schema/integration/ip 
+                	http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+	<!-- ALL PORTS ARE DEFAULTED TO 1199 - To use multiple integration points use different ports in .properties file -->
+
+	<!-- Our exported RMI interface -->
+<!--<import resource="integration/rmi.xml"/>-->
+
+	<!-- Our UDP implementation - unicast is currently the only option available -->
+   	<import resource="integration/udp.xml"/>
+	
+	
+	<!-- Our TCP implementation - DO NOT USE - currently it starts to throw errors after a while -->
+<!--<import resource="integration/tcp.xml"/>-->
+		
+	<!-- general service class - takes in the byte[] and saves the metric -->
+	<bean id="accumulator" class="com.monstersoftwarellc.graphtastic.integration.MetricAccumulator" />
+</beans>

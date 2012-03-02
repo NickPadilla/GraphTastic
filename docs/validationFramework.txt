@@ -1,0 +1,31 @@
+for hibernate validation, which is currently the best and doesn't have any dependencies so its okay to use.
+all you need to do is to add the JSR-303 bean validation spec and hibernate-validator jar to the app 
+and use spring 3.1 of course!
+
+If you want to use your message.properties, used for internationalization, instead of the ValidatorMessages.properties that is
+required by the spec you can make sure this is in your config :
+
+	<mvc:annotation-driven validator="validator"/>
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+			p:basename="/WEB-INF/messages/messages"
+			p:cacheSeconds="1" 
+			p:defaultEncoding="UTF-8"/>
+	<!-- JSR-303 - BeanValidation -->
+    <bean id="validator"
+        class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="validationMessageSource" ref="messageSource"/>
+     </bean>
+     
+     
+Here is an apache JSF-303 implementation, however it is very new and doesn't currently mesure up to hibernate's validator impl:
+
+	<dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-validation_1.0_spec</artifactId>
+        <version>1.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>org.apache.bval.bundle</artifactId>
+        <version>0.3-incubating</version>
+    </dependency>

@@ -1,0 +1,2 @@
+Follow this Hibernate-Validator issue and upgrade once 4.3 is released, it will have the class level validation 
+annotation bug fixed:  https://hibernate.onjira.com/browse/HV-524 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        			http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+					http://www.springframework.org/schema/integration 
+					http://www.springframework.org/schema/integration/spring-integration.xsd
+                	http://www.springframework.org/schema/integration/ip 
+                	http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+	<!-- Our UDP implementation - unicast is currently the only option available -->
+   	<int-ip:udp-inbound-channel-adapter id="udpIn" 
+										channel="udpchannel" 
+										multicast="false"
+										port="${udpPort}"
+										lookup-host="false" />
+
+	<int:channel id="udpchannel" />
+
+	<int:service-activator id="udpactivator" 
+						   input-channel="udpchannel" 
+						   ref="accumulator"
+						   method="insertMetric" /> 
+	
+</beans>

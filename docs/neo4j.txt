@@ -1,0 +1,74 @@
+neo4j is quickly setup, 
+		
+		<org.springframework-version>3.1.0.RELEASE</org.springframework-version>
+		<org.aspectj-version>1.6.12</org.aspectj-version>
+		<org.springframework.data-version>2.0.0.RELEASE</org.springframework.data-version>
+
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-neo4j</artifactId>
+			<version>${org.springframework.data-version}</version>
+		</dependency>		
+		<!-- This is for the neo4j server connections -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-neo4j-rest</artifactId>
+			<version>${org.springframework.data-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+		
+		
+Then you need to add the neo4j namespace to the spring context xml, 
+
+	xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+	xsi:schemaLocation="http://www.springframework.org/schema/data/neo4j
+				http://www.springframework.org/schema/data/neo4j/spring-neo4j-2.0.xsd"
+				
+				
+	<!-- database solution -->	
+	<tx:annotation-driven mode="proxy"/>
+	<context:spring-configured/>
+	
+	<!-- Testing  -->
+	<neo4j:config graphDatabaseService="graphDatabaseService"/>
+	<bean id="graphDatabaseService" class="org.neo4j.kernel.EmbeddedGraphDatabase" destroy-method="shutdown">
+		<constructor-arg index="0" value="data/graph.db" />
+	</bean> 
+	
+	<!-- server setup 
+	<neo4j:config graphDatabaseService="graphDatabaseService"/>
+	<bean id="graphDatabaseService" class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase" >
+		<constructor-arg index="0" value="http://localhost:7474/db/data" />
+	</bean>-->
+	
+	<neo4j:repositories base-package="com.monstersoftwarellc.graphtastic.repository"/>		
+	
+You can ignore the compiler warning on the :repositories tag, spring will handle the template.  You can 
+now start on the implementation of the model and repositories, there are docs for this here:
+
+docs\neo4j-manual-milestone.pdf
+docs\spring-data-neo4j-reference.pdf

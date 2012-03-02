@@ -1,0 +1,12 @@
+to add automatic json to POJO parsing you need to add this to your maven dependencies:
+
+	<properties>
+		<org.codehaus.jackson-version>1.6.4</org.codehaus.jackson-version>
+	</properties>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${org.codehaus.jackson-version}</version>
+		</dependency>
+		
