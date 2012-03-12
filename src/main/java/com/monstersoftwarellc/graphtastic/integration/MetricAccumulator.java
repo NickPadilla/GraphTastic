@@ -23,6 +23,6 @@ public class MetricAccumulator {
 	 * @param metric
 	 */
 	public void insertMetric(byte[] metric) {
-		metricService.addMetric(metric);
+		metricService.addMetrics(metric);
 	}
 }

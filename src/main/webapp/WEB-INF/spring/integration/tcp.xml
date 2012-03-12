@@ -14,7 +14,9 @@
   	<int-ip:tcp-connection-factory id="metricsServer"
 								   type="server" 
 								   port="${tcpPort}"
-								   using-nio="true"/>
+								   using-nio="true"
+								   single-use="true"
+								   pool-size="${tcpUdpPoolSize}"/>
 
 	<int-ip:tcp-inbound-gateway id="gateway"
 								connection-factory="metricsServer"

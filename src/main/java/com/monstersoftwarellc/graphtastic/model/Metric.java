@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 /**
@@ -21,11 +22,13 @@ public class Metric {
 	
 	@GraphId
 	private Long id;
-
+	
+	@Indexed(indexName="nameIndex",fieldName="name")
 	private String name;
 	
 	private Object value;
 
+	@Indexed(indexName="timestampIndex",fieldName="timestamp")
 	private long timestamp;
 
 	/**

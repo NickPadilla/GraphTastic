@@ -26,20 +26,22 @@
 		<form>
 			<div id="operations" class="xleftcol3">
 				<!-- <button id="sendNewMetric" onclick="send()">New</button> -->
-				<button id="refresh">Refresh</button>
-				<input type="button" id="updateGraph" onclick="showMetrics()" value="Update Graph">
+				<button id="refresh">Refresh Page</button>
+				<input type="button" id="updateGraph" onclick="getData()" value="Update Graph">
+				<!-- <input type="button" id="replot" onclick="replot()" value="Replot Graph"> -->
 				<br />
-				<span style="padding: 5px;">Auto Update<input id="update" type="checkbox" title="Auto Update" checked="checked"/></span>
+				<span style="padding: 5px;">Auto Update<input id="update" type="checkbox" title="Auto Update" /></span>
 				<br />
 				<span style="padding: 5px;">Charts/Graphs</span>
-				<input type="radio" id="count" name="operation" value="count" checked="checked" onclick="showMetrics()">
+				<input type="radio" id="count" name="operation" value="count" checked="checked" onclick="replot()">
 				<label for="count">Count</label>
-				<input type="radio" id="percentage" name="operation" value="pie" onclick="showMetrics()"> 
+				<input type="radio" id="percentage" name="operation" value="pie" onclick="replot()"> 
 				<label for="percentage">Pie</label>
 			</div>
-			<div id="typesDiv" class="xrightcol3" style="padding: 5px;">
-				Metric Types
-				<br/>
+			<div class="xrightcol3" style="padding: 5px;">
+				Metric Types  <span id="typesDiv" ></span>
+				<br/><br/>
+				Time Agg  <span id="timeAggDiv" ></span>		
 			</div>
 		</form>
 		<div class="xmiddlecol3">
@@ -222,9 +224,9 @@
 					</select>
 				</span>
 				</label> <br /> <label> Start Date<br /> <input id="start"
-					type="date" name="start" value="Yesterday" maxlength="10"/>
+					type="date" name="start" value="12 Hours Ago" maxlength="10"/>
 				</label> <label> End Date<br /> <input id="end" type="date"
-					name="end" value="Today" maxlength="10"/>
+					name="end" value="Now" maxlength="10"/>
 				</label>		
 			</div>
 		</div>
@@ -232,6 +234,10 @@
 	<div id="graph" align="center" style="width: 100%; height: 90%">
 		<div id="title"></div>
 		<div id="legend" ></div>
+		<div id="loadingIndicator" >
+			<div class="circle"></div>
+			<div class="circle1"></div>
+		</div>
 		<div id="graphDiv" style="width: 85%; height: 80%"></div>
 	</div>
 </body>

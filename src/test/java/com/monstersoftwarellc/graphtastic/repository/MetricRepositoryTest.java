@@ -65,14 +65,14 @@ public class MetricRepositoryTest extends TestApplicationContext {
 	
 	@Test
 	@Transactional
-	public void test100SavesAndFindByNameAndTimestampGreaterThanAndTimestampLessThan(){
+	public void test100SavesAndFindByNameAndTimestagetMetricsmpGreaterThanAndTimestampLessThan(){
 		long timestamp = new Date().getTime();
 		// save 100 more and save new date every time.
 		saveGroup(100, "LOG");
 		long timestamp2 = new Date().getTime();		
 		List<Metric> metrics = metricRepository.findByNameAndTimestampGreaterThanAndTimestampLessThan("LOG", timestamp, timestamp2);
 		assertTrue(!metrics.isEmpty());
-		assertTrue(metrics.size() == 99);// include zero
+		assertTrue(metrics.size() == 100);// include zero
 		assertTrue(metricRepository.count() == 100);
 	}
 	
@@ -93,20 +93,6 @@ public class MetricRepositoryTest extends TestApplicationContext {
 	}
 	
 	@Test
-	@Transactional
-	public void test100SavesAndFindUniqueMetricNames(){
-		// save 100 more and save new date every time.
-		saveGroup(100, "TEST", "LOG");
-		List<String> metrics = metricRepository.findAllUniqueNames();
-		if(LOG.isDebugEnabled()){
-			LOG.debug("Size of Unique MetricNames : " + metrics.size() );
-		}
-		assertTrue(!metrics.isEmpty());
-		assertTrue(metrics.size() == 2);
-		assertTrue(metricRepository.count() == 100);
-	}
-	
-	@Test
 	@Transactional	
 	public void testCountByMetricName() throws InterruptedException{
 		long timestamp = new Date().getTime();
@@ -116,13 +102,13 @@ public class MetricRepositoryTest extends TestApplicationContext {
 		Thread.currentThread();
 		Thread.sleep(1000);
 		saveGroup(100, "TEST");
-		List<Count> counts = metricRepository.getCountByMetricName("TEST", timestamp, timestamp2);
+		List<Count> counts = metricRepository.getCountByMetricNameBetween("TEST", timestamp, timestamp2);
 		if(LOG.isDebugEnabled()){
 			for(Count count : counts){
 				LOG.debug("			time : " + count.getTimestamp() + "     count : " + count.getCount());
 			}
 		}
-		assertTrue(counts.size() <= 100);
+		assertTrue(counts.size() <= 100 && counts.size() > 50);
 	}
 
 	/**

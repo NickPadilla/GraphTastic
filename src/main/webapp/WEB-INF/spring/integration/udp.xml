@@ -15,7 +15,8 @@
 										channel="udpchannel" 
 										multicast="false"
 										port="${udpPort}"
-										lookup-host="false" />
+										lookup-host="false" 
+										pool-size="${tcpUdpPoolSize}" />
 
 	<int:channel id="udpchannel" />
 

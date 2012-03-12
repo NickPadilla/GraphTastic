@@ -3,14 +3,18 @@
  */
 package com.monstersoftwarellc.graphtastic.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.monstersoftwarellc.graphtastic.model.Metric;
+import com.monstersoftwarellc.graphtastic.model.MetricTypes;
 import com.monstersoftwarellc.graphtastic.repository.MetricRepository;
+import com.monstersoftwarellc.graphtastic.repository.MetricTypeRepository;
 import com.monstersoftwarellc.graphtastic.utility.MetricUtility;
 
 /**
@@ -20,14 +24,18 @@ import com.monstersoftwarellc.graphtastic.utility.MetricUtility;
  */
 @Service
 public class MetricService implements IMetricService {
-	
+
 	private static final Logger LOG = Logger.getLogger(MetricService.class);
-	
+
 	@Autowired
 	private MetricRepository metricRepository;
 	
+	@Autowired
+	private MetricTypeRepository metricTypeRepository;
+
 	@Value("#{graphtastic.retries}")
 	private Integer retries;
+	
 
 	/* (non-Javadoc)
 	 * @see com.monstersoftwarellc.graphtastic.service.IRepositoryService#getRepository()
@@ -41,32 +49,65 @@ public class MetricService implements IMetricService {
 	 * @see com.monstersoftwarellc.graphtastic.service.IMetricService#addMetric(java.lang.String, java.lang.String, long)
 	 */
 	@Override
-	@Transactional
 	public void addMetric(String name, String value, long timestamp) {
-		add(MetricUtility.buildMetric(name, value, timestamp), 0);
-	}
-	
-	private void add(Metric metric, int retry){
-		try {
-			metric = metricRepository.save(metric);
-			if(LOG.isDebugEnabled()){
-				LOG.debug("Metric Saved! : " + metric.toString());
-			}
-		}catch(Exception ex){
-			LOG.error("Exception Saving Metric - Will attempt "+retries+" retries!", ex);
-			while(retry < retries){
-				add(metric, ++retry);
-			}
-		}
+		addMetricTypeIfNeeded(name);
+		metricRepository.save(MetricUtility.buildMetric(name, value, timestamp));
 	}
 
 	/* (non-Javadoc)
 	 * @see com.monstersoftwarellc.graphtastic.service.IMetricService#addMetric(byte[])
 	 */
 	@Override
-	public void addMetric(byte[] metricData) {
+	public void addMetrics(byte[] metricData) {
 		String[] data = new String(metricData).split(",");
-		addMetric(data[0], data[1], Long.parseLong(data[2]));
+		saveDataArray(data);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.monstersoftwarellc.graphtastic.service.IMetricService#addMetrics(java.lang.String)
+	 */
+	@Override
+	public void addMetrics(String csvMetrics) {
+		saveDataArray(csvMetrics.split(","));
+	}
+	
+	private void saveDataArray(String[] data){
+		List<Metric> metrics = new ArrayList<Metric>();
+		List<String> labels = new ArrayList<String>();
+		for(int i = 0; i < data.length; i++){
+			String name = data[i];
+			metrics.add(MetricUtility.buildMetric(name, data[++i], Long.parseLong(data[++i])));
+			if(!labels.contains(name)){
+				labels.add(name);
+			}
+		}
+		for(String label : labels){
+			addMetricTypeIfNeeded(label);
+		}
+		saveList(metrics, 0);
+	}
+	
+	private void addMetricTypeIfNeeded(String label){
+		if(metricTypeRepository.getMetricTypesByLabel(label) == null){
+			metricTypeRepository.save(new MetricTypes(label));
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void saveList(List<Metric> metrics, int retry) {		
+		try {
+			metricRepository.save(metrics);
+			if(LOG.isDebugEnabled()){
+				LOG.debug("Metric's Saved! : " + metrics.size());
+			}
+		}catch(Exception ex){
+			LOG.error("Exception Saving Metric - Will attempt "+retries+" retries!", ex);
+			while(retry < retries){
+				saveList(metrics, retry++);
+			}
+		}
 	}
 
 }

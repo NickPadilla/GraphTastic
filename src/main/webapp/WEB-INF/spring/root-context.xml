@@ -29,22 +29,23 @@
 		<property name="properties" ref="graphtastic" />
 	</bean>
 	
-	<context:component-scan base-package="com.monstersoftwarellc.graphtastic" >
+	<context:component-scan base-package="com.monstersoftwarellc.graphtastic" scoped-proxy="interfaces" >
 		<context:exclude-filter type="regex" expression="com.monstersoftwarellc.graphtastic.controller"/>
 	</context:component-scan>
 	
 	<!-- database solution -->	
 	<tx:annotation-driven />
 	<!-- enables spring aspects -->
-	<context:spring-configured/>
+	<context:spring-configured />
 	
 	<!-- Testing  -->
-	<neo4j:config graphDatabaseService="graphDatabaseService"/>
+	<neo4j:config graphDatabaseService="graphDatabaseService" />
 	<bean id="graphDatabaseService" class="org.neo4j.kernel.EmbeddedGraphDatabase" destroy-method="shutdown">
 		<constructor-arg index="0" value="${graphDatabaseLocation}" />
 		<constructor-arg index="1">
 			<map>
 				<entry key="allow_store_upgrade" value="true"/>
+				<!-- <entry key="cache_type" value="weak"/> -->
 			</map>
 		</constructor-arg>
 	</bean> 
@@ -60,5 +61,6 @@
 		</constructor-arg>
 	</bean>-->
 	
-	<neo4j:repositories base-package="com.monstersoftwarellc.graphtastic.repository"/>
+	<neo4j:repositories base-package="com.monstersoftwarellc.graphtastic.repository" />
+		
 </beans>

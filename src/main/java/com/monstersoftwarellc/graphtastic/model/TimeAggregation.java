@@ -7,8 +7,13 @@ package com.monstersoftwarellc.graphtastic.model;
  * @author nicholas
  *
  */
-public class Graph {
-	/*
-	private List<>*/
+public enum TimeAggregation {
+	
+	ONE,
+	TEN,
+	THIRTY,
+	HOUR,
+	DAY,
+	MONTH;
 
 }

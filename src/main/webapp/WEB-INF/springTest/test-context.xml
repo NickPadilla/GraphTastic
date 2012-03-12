@@ -12,6 +12,8 @@
 				
 	<import resource="../spring/root-context.xml"/>
 	
+	<import resource="../spring/servlet-context.xml"/>
+	
 	<import resource="../spring/integration-context.xml"/>				
 	
 	<!-- Make sure all integration points are at least able to start up each one

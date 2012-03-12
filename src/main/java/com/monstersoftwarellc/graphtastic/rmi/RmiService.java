@@ -3,6 +3,8 @@
  */
 package com.monstersoftwarellc.graphtastic.rmi;
 
+import java.rmi.RemoteException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,14 @@ public class RmiService implements IRmiService {
 	@Override
 	public void insertMetric(String name, String value, long timestamp) {
 		metricService.addMetric(name, value, timestamp);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.monstersoftwarellc.graphtastic.rmi.IRmiService#insertMetrics(java.lang.String)
+	 */
+	@Override
+	public void insertMetrics(String csvData) throws RemoteException {
+		metricService.addMetrics(csvData);
 	}
 
 }

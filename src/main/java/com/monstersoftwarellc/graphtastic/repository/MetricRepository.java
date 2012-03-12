@@ -10,7 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.MapResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.annotation.ResultColumn;
+import org.springframework.data.neo4j.repository.CypherDslRepository;
 import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.NamedIndexRepository;
 
 import com.monstersoftwarellc.graphtastic.model.Metric;
 
@@ -19,7 +21,7 @@ import com.monstersoftwarellc.graphtastic.model.Metric;
  * @author nicholas
  *
  */
-public interface MetricRepository extends GraphRepository<Metric> {
+public interface MetricRepository extends GraphRepository<Metric>, CypherDslRepository<Metric>, NamedIndexRepository<Metric>  {
 	
 	/**
 	 * Method will get all {@link Metric} by {@link Metric#getName()}. 
@@ -46,6 +48,7 @@ public interface MetricRepository extends GraphRepository<Metric> {
 	 * @param to
 	 * @return
 	 */
+	@Query("start metric=node:nameIndex(name={0}) where metric.timestamp >= {1} and metric.timestamp <= {2} return metric")	
 	List<Metric> findByNameAndTimestampGreaterThanAndTimestampLessThan(String name, long from, long to);
 	
 	/**
@@ -57,25 +60,19 @@ public interface MetricRepository extends GraphRepository<Metric> {
 	 * @param to
 	 * @return
 	 */
+	@Query("start metric=node:__types__(className='com.monstersoftwarellc.graphtastic.model.Metric') where metric.value = {0} and metric.timestamp >= {1} and metric.timestamp <= {2} return metric")		
 	List<Metric> findByValueAndTimestampGreaterThanAndTimestampLessThan(Object value, long from, long to);
 	
-	/**
-	 * Find all unique {@link Metric#getName()} values. 
-	 * @return
-	 */
-	@Query("start metric=node:__types__(className='com.monstersoftwarellc.graphtastic.model.Metric') return distinct metric.name")
-	List<String> findAllUniqueNames();
-	
-	@Query("start metric=node:__types__(className='com.monstersoftwarellc.graphtastic.model.Metric') where metric.name = {0} and metric.timestamp >= {1} and metric.timestamp < {2} return distinct metric.timestamp, count(metric.timestamp), metric.value, metric.name order by metric.timestamp")
-	List<Count> getCountByMetricName(String name, long start, long end);
+	@Query("start metric=node:nameIndex(name={0}) where metric.timestamp >= {1} and metric.timestamp <= {2} return distinct metric.timestamp, count(metric.timestamp), metric.value, metric.name")
+	List<Count> getCountByMetricNameBetween(String name, long start, long end);
 	
 	@MapResult
 	public interface Count {
 	    @ResultColumn("metric.timestamp")
-	   	Long getTimestamp();
+	   	long getTimestamp();
 
 	    @ResultColumn("count(metric.timestamp)")
-	    Long getCount();	    
+	    long getCount();	    
 
 	    @ResultColumn("metric.value")
 	    Object getValue();	        

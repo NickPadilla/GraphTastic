@@ -1,7 +1,6 @@
 package com.monstersoftwarellc.graphtastic.controller;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,11 +14,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import scala.actors.threadpool.Arrays;
+
 import com.monstersoftwarellc.graphtastic.model.GraphResponse;
 import com.monstersoftwarellc.graphtastic.model.Metric;
 import com.monstersoftwarellc.graphtastic.model.ResponseStatus;
+import com.monstersoftwarellc.graphtastic.model.TimeAggregation;
 import com.monstersoftwarellc.graphtastic.repository.MetricRepository.Count;
+import com.monstersoftwarellc.graphtastic.repository.MetricTypeRepository;
 import com.monstersoftwarellc.graphtastic.service.IMetricService;
+import com.monstersoftwarellc.graphtastic.utility.MetricUtility;
 
 /**
  * Handles requests for the application home page.
@@ -33,18 +37,15 @@ public class GraphController {
 	@Autowired
 	private IMetricService metricService;
 	
+	@Autowired
+	private MetricTypeRepository metricTypeRepository;
+	
 	@RequestMapping(method=RequestMethod.GET)
 	public String toGraph() {
 		return "graph";
 	}
 	
-	/**
-	 * Will provide a {@link Page} object that contains a list of {@link Metric}'s.  This will 
-	 * be able to provide all of the needed data to save a metric. 
-	 * @param page
-	 * @param numberPerPage
-	 * @return
-	 */
+
 	@RequestMapping(value="addMetric/{name}&{value}&{timestamp}", method=RequestMethod.PUT, produces="application/json")
 	public @ResponseBody ResponseStatus addMetric(@PathVariable String name, @PathVariable String value, @PathVariable long timestamp) {
 		try{
@@ -56,18 +57,23 @@ public class GraphController {
 		return ResponseStatus.OK;
 	}
 	
-	/**
-	 * Will provide a {@link Page} object that contains a list of {@link Metric}'s.  This will 
-	 * be able to provide all of the needed data to save a metric. We will use the time this
-	 * method was called as the {@link Metric#setTimestamp(long)} value.
-	 * @param page
-	 * @param numberPerPage
-	 * @return
-	 */
+
 	@RequestMapping(value="addMetric/{name}&{value}", method=RequestMethod.PUT, produces="application/json")
 	public @ResponseBody ResponseStatus addMetric(@PathVariable String name, @PathVariable String value) {
 		try{
 			metricService.addMetric(name, value, new Date().getTime());
+		}catch(Exception ex){
+			LOG.error("Exception Adding Metric Through GUI! : ", ex);
+			return ResponseStatus.ERROR;
+		}
+		return ResponseStatus.OK;
+	}
+	
+
+	@RequestMapping(value="addMetric/{metrics}", method=RequestMethod.PUT, produces="application/json")
+	public @ResponseBody ResponseStatus addMetric(@PathVariable String metrics) {
+		try{
+			metricService.addMetrics(metrics);
 		}catch(Exception ex){
 			LOG.error("Exception Adding Metric Through GUI! : ", ex);
 			return ResponseStatus.ERROR;
@@ -85,8 +91,11 @@ public class GraphController {
 	 */
 	@RequestMapping(value="listUniqueMetricNames", method=RequestMethod.GET)
 	public @ResponseBody List<String> listMetricTypes() {
-		LOG.debug("Total Count Of Metrics : " + metricService.getRepository().count());
-		return metricService.getRepository().findAllUniqueNames(); 
+		long start = new Date().getTime();
+		List<String> names = metricTypeRepository.getAllMetricTypeLabels();
+		long end = new Date().getTime();
+		LOG.info("listMetricTypes() : " + names.size() + "  took : " + (end - start) + "ms");
+		return names; 
 	}
 	
 	/**
@@ -116,27 +125,25 @@ public class GraphController {
 		return metricService.getRepository().findAll(new PageRequest(page, numberPerPage)); 
 	}
 	
-	@RequestMapping(value="countByMetricNameTimestamp/{name}&{start}&{end}", method=RequestMethod.GET)
-	public @ResponseBody HashMap<String, GraphResponse> countByMetricNameTimestamp(@PathVariable String name, @PathVariable Long start, @PathVariable Long end){
-		List<Count> counts = metricService.getRepository().getCountByMetricName(name, start, end);
-		HashMap<String, GraphResponse> responses = new HashMap<String, GraphResponse>();
-		for(Count count : counts){
-			// now we only have minutes
-			if(responses.containsKey(count.getValue())){
-				if(responses.get(count.getValue()).getData().containsKey(count.getTimestamp())){
-					// contains key so we need to add to the count					
-					long countInMap = responses.get(count.getValue()).getData().get(count.getTimestamp());
-					responses.get(count.getValue()).getData().put(count.getTimestamp(), countInMap+count.getCount());
-				}else{
-					responses.get(count.getValue()).getData().put(count.getTimestamp(), count.getCount());
-				}
-			}else{
-				GraphResponse resp = new GraphResponse();
-				resp.setLabel(String.valueOf(count.getValue()));
-				resp.getData().put(count.getTimestamp(), count.getCount());
-				responses.put(String.valueOf(count.getValue()), resp);
-			}
-		}
-		return responses;
+	/**
+	 * Count of metric per timestamp and {@link Metric#getName()}.
+	 * @param name
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	@RequestMapping(value="countByMetricNameTimestamp/{name}&{timeAgg}&{start}&{end}", method=RequestMethod.GET, produces="application/json")
+	public @ResponseBody GraphResponse countByMetricNameTimestamp(@PathVariable String name, @PathVariable String timeAgg, @PathVariable Long start, @PathVariable Long end){	
+		long startT = new Date().getTime();
+		List<Count> counts = metricService.getRepository().getCountByMetricNameBetween(name, start, end);
+		long endT = new Date().getTime();
+		LOG.info("we have loaded metrics count from repo : " + counts.size() + "  took : " + (endT - startT) + "ms");
+		return MetricUtility.buildGraphResponse(counts, TimeAggregation.valueOf(timeAgg));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="timeAggregation", method=RequestMethod.GET, produces="application/json")
+	public @ResponseBody List<TimeAggregation> getTimeAggregation(){
+		return Arrays.asList(TimeAggregation.values());
 	}
 }

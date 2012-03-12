@@ -11,7 +11,7 @@ import java.rmi.RemoteException;
 public interface IRmiService extends Remote, Serializable {
 
 	/**
-	 * This is the contract for RMI integration with GraphTastic. 
+	 * RMI integration with GraphTastic. 
 	 * @param name - metric name
 	 * @param value - metric value
 	 * @param timestamp - metric timestamp in mills
@@ -19,4 +19,5 @@ public interface IRmiService extends Remote, Serializable {
 	 */
 	public abstract void insertMetric(String name, String value, long timestamp) throws RemoteException;
 	
+	public abstract void insertMetrics(String csvData) throws RemoteException;
 }

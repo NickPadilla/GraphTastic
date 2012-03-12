@@ -31,6 +31,8 @@ public interface IMetricService extends IRepositoryService<MetricRepository> {
 	 * <br/><br/>
 	 * @param metricData
 	 */
-	public abstract void addMetric(byte[] metricData); 
+	public abstract void addMetrics(byte[] metricData); 
+	
+	public abstract void addMetrics(String csvMetrics);
 
 }
