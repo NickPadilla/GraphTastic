@@ -6,7 +6,7 @@
 	<artifactId>graphtastic</artifactId>
 	<name>graphtastic</name>
 	<packaging>war</packaging>
-	<version>1.0.0.RELEASE</version>	
+	<version>1.0.1.RELEASE</version>	
 	<repositories>
 		<repository>
 			<id>EclipseLink Repo</id>

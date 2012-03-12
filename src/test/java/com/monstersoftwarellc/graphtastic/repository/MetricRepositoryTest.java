@@ -51,7 +51,6 @@ public class MetricRepositoryTest extends TestApplicationContext {
 	@Test
 	@Transactional
 	public void testSaveAndFindByNameAndPage(){
-		long timestamp = new Date().getTime();
 		saveGroup(100, "LOG");
 		Page<Metric> metrics = metricRepository.findByName("LOG", new PageRequest(0, 10));
 		assertTrue(metrics.hasContent());
@@ -59,7 +58,6 @@ public class MetricRepositoryTest extends TestApplicationContext {
 		Metric metric = metrics.getContent().get(0);
 		assertNotNull(metric.getId());
 		assertEquals("LOG", metric.getName());
-		assertEquals(timestamp, metric.getTimestamp());
 		assertEquals("INFO", metric.getValue());
 	}
 	
