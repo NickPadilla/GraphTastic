@@ -10,14 +10,11 @@
                 	http://www.springframework.org/schema/integration/ip 
                 	http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
-	<!-- ALL PORTS ARE DEFAULTED TO 1199 - To use multiple integration points use different ports in .properties file -->
-
 	<!-- Our exported RMI interface -->
 	<!-- <import resource="integration/rmi.xml"/> -->
 
 	<!-- Our UDP implementation - unicast is currently the only option available -->
     <import resource="integration/udp.xml"/>
-	
 	
 	<!-- Our TCP implementation - DO NOT USE - currently it starts to throw errors after a while -->
 	<!-- <import resource="integration/tcp.xml"/> -->

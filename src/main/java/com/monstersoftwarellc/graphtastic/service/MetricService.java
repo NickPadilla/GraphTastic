@@ -76,7 +76,13 @@ public class MetricService implements IMetricService {
 		List<String> labels = new ArrayList<String>();
 		for(int i = 0; i < data.length; i++){
 			String name = data[i];
-			metrics.add(MetricUtility.buildMetric(name, data[++i], Long.parseLong(data[++i])));
+			String value = data[++i];
+			// make sure we are don't deal with any decimal values.
+			String timestamp = data[++i];
+			if(timestamp.contains(".")){
+				timestamp = timestamp.substring(0, timestamp.indexOf("."));
+			}
+			metrics.add(MetricUtility.buildMetric(name, value, Long.parseLong(timestamp)));
 			if(!labels.contains(name)){
 				labels.add(name);
 			}

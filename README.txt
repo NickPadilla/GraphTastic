@@ -29,4 +29,4 @@ problems with any browser that doesn't have default support for HTML5.  I am usi
 it does in the latest builds of Chrome or Fire Fox - these browsers are known to work correctly. 
 
 
-NOTE: if you just want the WAR you can find the current build in the 'build' directory.  
+NOTE: if you just want the WAR you can find the current build in the Downloads section.
